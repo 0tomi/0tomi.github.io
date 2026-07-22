@@ -1,0 +1,851 @@
+---
+// ============================================================
+// Diseño 07 — "Stack"
+// Portfolio sobrio, oscuro, moderno. Los proyectos se APILAN al
+// scrollear (efecto mazo de cartas) con position: sticky puro CSS.
+// Fuente única de contenido: src/data/profile.ts (cero texto hardcodeado).
+// Página autocontenida: estilos y scripts propios, sin CSS global.
+// ============================================================
+import { profile, projects, skills } from '../../data/profile';
+
+const hasLinkedin = profile.links.linkedin.length > 0;
+
+// Número visible de cada proyecto (01, 02, 03…).
+const pad = (n: number) => String(n + 1).padStart(2, '0');
+---
+
+<html lang="es">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="generator" content={Astro.generator} />
+		<meta
+			name="description"
+			content={`${profile.name} — ${profile.role}. ${profile.tagline}`}
+		/>
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<title>{profile.name} — {profile.role}</title>
+	</head>
+	<body>
+		<main>
+			<!-- HERO: centrado — foto → nombre → rol → tagline -->
+			<section class="hero" aria-labelledby="hero-name">
+				<div class="hero__inner">
+					<div class="hero__avatar intro" style="--i: 0">
+						<img
+							src={profile.avatar}
+							alt={`Foto de ${profile.name}`}
+							width="400"
+							height="400"
+							decoding="async"
+							fetchpriority="high"
+						/>
+					</div>
+					<h1 id="hero-name" class="hero__name intro" style="--i: 1">
+						{profile.name}
+					</h1>
+					<p class="hero__role intro" style="--i: 2">
+						{profile.role}
+					</p>
+					<p class="hero__tagline intro" style="--i: 3">
+						{profile.tagline}
+					</p>
+				</div>
+			</section>
+
+			<!-- PROYECTOS: tarjetas apiladas con sticky stacking -->
+			<section id="proyectos" class="projects" aria-label="Proyectos">
+				<div class="projects__head reveal">
+					<p class="eyebrow">Proyectos</p>
+					<h2 class="projects__title">Cosas que construí</h2>
+				</div>
+
+				<div class="stack">
+					{
+						projects.map((project, i) => (
+							<article class="pcard" style={`--i: ${i}`}>
+								<div class="pcard__inner">
+									{project.image ? (
+										<button
+											type="button"
+											class="pcard__media pcard__media--zoom"
+											data-zoom
+											data-src={project.image}
+											data-alt={`Captura de ${project.name}`}
+											aria-label={`Ampliar captura de ${project.name}`}
+										>
+											<img
+												src={project.image}
+												alt={`Captura de ${project.name}`}
+												width="1600"
+												height="1000"
+												loading="lazy"
+												decoding="async"
+											/>
+										</button>
+									) : (
+										<div class="pcard__media pcard__media--empty" aria-hidden="true">
+											<span>{pad(i)}</span>
+										</div>
+									)}
+
+									<div class="pcard__panel">
+										<div class="pcard__top">
+											<span class="pcard__num">{pad(i)}</span>
+											{project.year && (
+												<span class="pcard__year">{project.year}</span>
+											)}
+										</div>
+										<h3 class="pcard__name">{project.name}</h3>
+										<p class="pcard__desc">{project.description}</p>
+										{project.stack.length > 0 && (
+											<p class="pcard__tech">{project.stack.join(' · ')}</p>
+										)}
+										{(project.repo || project.demo) && (
+											<div class="pcard__links">
+												{project.repo && (
+													<a
+														class="pcard__link"
+														href={project.repo}
+														target="_blank"
+														rel="noopener noreferrer"
+													>
+														Repo <span aria-hidden="true">→</span>
+													</a>
+												)}
+												{project.demo && (
+													<a
+														class="pcard__link"
+														href={project.demo}
+														target="_blank"
+														rel="noopener noreferrer"
+													>
+														Demo <span aria-hidden="true">→</span>
+													</a>
+												)}
+											</div>
+										)}
+									</div>
+								</div>
+							</article>
+						))
+					}
+				</div>
+			</section>
+
+			<!-- SKILLS -->
+			<section id="skills" class="skills">
+				<div class="skills__head reveal">
+					<p class="eyebrow">Skills</p>
+					<h2 class="projects__title">Herramientas del oficio</h2>
+				</div>
+				<div class="skills__grid">
+					{
+						skills.map((group, i) => (
+							<div class="skills__group reveal" style={`--i: ${i}`}>
+								<p class="skills__label">{group.label}</p>
+								<p class="skills__tech">{group.items.join(' · ')}</p>
+							</div>
+						))
+					}
+				</div>
+			</section>
+		</main>
+
+		<!-- LIGHTBOX: un solo dialog reutilizado para ampliar capturas -->
+		<dialog
+			class="lightbox"
+			id="lightbox"
+			aria-label="Vista ampliada de la captura"
+		>
+			<img
+				class="lightbox__img"
+				id="lightbox-img"
+				src=""
+				alt=""
+				width="1600"
+				height="1000"
+				decoding="async"
+			/>
+			<button
+				type="button"
+				class="lightbox__close"
+				data-close
+				aria-label="Cerrar vista ampliada"
+			>
+				<span aria-hidden="true">✕</span>
+			</button>
+		</dialog>
+
+		<!-- FOOTER -->
+		<footer id="contacto" class="footer">
+			<div class="footer__inner reveal">
+				<p class="footer__eyebrow">¿Trabajamos juntos?</p>
+				<a class="footer__mail" href={`mailto:${profile.email}`}>
+					{profile.email}
+				</a>
+				<ul class="footer__links">
+					<li>
+						<a
+							href={profile.links.github}
+							target="_blank"
+							rel="noopener noreferrer">GitHub</a
+						>
+					</li>
+					{
+						hasLinkedin && (
+							<li>
+								<a
+									href={profile.links.linkedin}
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									LinkedIn
+								</a>
+							</li>
+						)
+					}
+				</ul>
+				<p class="footer__note">
+					© {new Date().getFullYear()} {profile.name} · {profile.handle}
+				</p>
+			</div>
+		</footer>
+
+		<script>
+			// Reveals on-scroll (una sola vez). El stacking es scroll nativo, sin JS.
+			const reveals = document.querySelectorAll<HTMLElement>('.reveal');
+			const prefersReduced = window.matchMedia(
+				'(prefers-reduced-motion: reduce)',
+			).matches;
+
+			if ('IntersectionObserver' in window && !prefersReduced) {
+				const io = new IntersectionObserver(
+					(entries, obs) => {
+						for (const entry of entries) {
+							if (entry.isIntersecting) {
+								entry.target.classList.add('is-in');
+								obs.unobserve(entry.target);
+							}
+						}
+					},
+					{ rootMargin: '0px 0px -10% 0px', threshold: 0.1 },
+				);
+				reveals.forEach((el) => io.observe(el));
+			} else {
+				reveals.forEach((el) => el.classList.add('is-in'));
+			}
+
+			// Entrada del hero: activa el stagger tras el primer frame pintado.
+			requestAnimationFrame(() =>
+				requestAnimationFrame(() =>
+					document.body.classList.add('is-ready'),
+				),
+			);
+
+			// Lightbox: un único <dialog> reutilizado vía data-attributes.
+			const lightbox = document.getElementById(
+				'lightbox',
+			) as HTMLDialogElement | null;
+			const lightboxImg = document.getElementById(
+				'lightbox-img',
+			) as HTMLImageElement | null;
+
+			if (lightbox && lightboxImg) {
+				const triggers =
+					document.querySelectorAll<HTMLElement>('[data-zoom]');
+				triggers.forEach((btn) => {
+					btn.addEventListener('click', () => {
+						lightboxImg.src = btn.dataset.src ?? '';
+						lightboxImg.alt = btn.dataset.alt ?? '';
+						lightbox.showModal();
+					});
+				});
+
+				const close = () => lightbox.close();
+
+				// Botón ✕
+				lightbox
+					.querySelector<HTMLElement>('[data-close]')
+					?.addEventListener('click', close);
+
+				// Click en el backdrop (fuera de la imagen y del botón).
+				lightbox.addEventListener('click', (event) => {
+					if (event.target === lightbox) close();
+				});
+
+				// Escape lo maneja el <dialog> nativo. Limpiamos el src al cerrar.
+				lightbox.addEventListener('close', () => {
+					lightboxImg.src = '';
+					lightboxImg.alt = '';
+				});
+			}
+		</script>
+
+		<style>
+			/* ---------- Tokens ---------- */
+			:global(:root) {
+				--bg: #0e0e12;
+				--surface: #17171c;
+				--surface-2: #1e1e24;
+				--text: #f2f2f4;
+				--text-2: #a6a6ad;
+				--text-3: #6d6d76;
+				/* Único acento cálido, cobre desaturado, usado con moderación. */
+				--accent: #d6a271;
+				--accent-soft: rgba(214, 162, 113, 0.14);
+				--hairline: rgba(255, 255, 255, 0.08);
+				--hairline-2: rgba(255, 255, 255, 0.12);
+				--ease: cubic-bezier(0.23, 1, 0.32, 1);
+			}
+
+			:global(html) {
+				scroll-behavior: smooth;
+				background: var(--bg);
+				-webkit-text-size-adjust: 100%;
+			}
+
+			:global(body) {
+				margin: 0;
+				background: var(--bg);
+				color: var(--text);
+				font-family:
+					system-ui,
+					-apple-system,
+					'Segoe UI',
+					Roboto,
+					sans-serif;
+				line-height: 1.5;
+				font-optical-sizing: auto;
+				-webkit-font-smoothing: antialiased;
+				text-rendering: optimizeLegibility;
+				overflow-x: hidden;
+			}
+
+			:global(*, *::before, *::after) {
+				box-sizing: border-box;
+			}
+
+			.eyebrow {
+				margin: 0 0 0.6rem;
+				font-size: 0.76rem;
+				font-weight: 600;
+				text-transform: uppercase;
+				letter-spacing: 0.16em;
+				color: var(--accent);
+			}
+
+			/* ---------- Hero (centrado, estilo Showcase) ---------- */
+			.hero {
+				min-height: min(84svh, 760px);
+				display: grid;
+				place-items: center;
+				padding: clamp(4.5rem, 14vh, 8rem) 1.5rem clamp(3rem, 8vh, 5rem);
+			}
+
+			.hero__inner {
+				max-width: 42rem;
+				text-align: center;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+			}
+
+			.hero__avatar {
+				width: clamp(120px, 32vw, 160px);
+				aspect-ratio: 1;
+				border-radius: 50%;
+				overflow: hidden;
+				background: var(--surface-2);
+				border: 1px solid var(--hairline-2);
+				box-shadow:
+					inset 0 1px 0 rgba(255, 255, 255, 0.08),
+					0 24px 50px -28px rgba(0, 0, 0, 0.9);
+			}
+
+			.hero__avatar img {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+			}
+
+			.hero__name {
+				margin: 1.6rem 0 0;
+				font-size: clamp(2.6rem, 8.5vw, 5rem);
+				line-height: 1.02;
+				letter-spacing: -0.02em;
+				font-weight: 600;
+			}
+
+			.hero__role {
+				margin: 0.85rem 0 0;
+				font-size: 0.82rem;
+				text-transform: uppercase;
+				letter-spacing: 0.18em;
+				color: var(--accent);
+				font-weight: 600;
+			}
+
+			.hero__tagline {
+				margin: 1.1rem 0 0;
+				font-size: clamp(1.05rem, 2.4vw, 1.3rem);
+				line-height: 1.55;
+				color: var(--text-2);
+				max-width: 42ch;
+				text-wrap: balance;
+			}
+
+			/* ---------- Proyectos ---------- */
+			.projects {
+				max-width: 60rem;
+				margin: 0 auto;
+				padding: clamp(2rem, 6vh, 4rem) 1.5rem clamp(4rem, 12vh, 8rem);
+			}
+
+			.projects__head {
+				margin-bottom: clamp(2rem, 5vh, 3rem);
+			}
+
+			.projects__title {
+				margin: 0;
+				font-size: clamp(1.8rem, 4.5vw, 2.9rem);
+				line-height: 1.08;
+				letter-spacing: -0.02em;
+				font-weight: 600;
+			}
+
+			/*
+			 * STACKING: cada tarjeta es sticky. Al scrollear, la siguiente sube y
+			 * se superpone a la anterior, que queda pegada con su borde asomando.
+			 * Offsets levemente crecientes por índice → efecto mazo de cartas.
+			 */
+			.stack {
+				display: flex;
+				flex-direction: column;
+				/* separación entre cartas = recorrido de scroll antes de apilar */
+				gap: clamp(2.5rem, 7vh, 5rem);
+			}
+
+			.pcard {
+				position: sticky;
+				top: calc(2rem + var(--i) * 1.6rem);
+				/* margen inferior extra para que haya scroll y se note el apilado */
+				padding-bottom: 0.5rem;
+			}
+
+			.pcard__inner {
+				border-radius: 22px;
+				overflow: hidden;
+				background: var(--surface);
+				border: 1px solid var(--hairline-2);
+				box-shadow: 0 40px 80px -50px rgba(0, 0, 0, 0.95);
+			}
+
+			.pcard__media {
+				appearance: none;
+				margin: 0;
+				padding: 0;
+				width: 100%;
+				font: inherit;
+				color: inherit;
+				position: relative;
+				display: block;
+				aspect-ratio: 16 / 10;
+				background: var(--surface-2);
+				border: 0;
+				border-bottom: 1px solid var(--hairline);
+			}
+
+			.pcard__media img {
+				display: block;
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+			}
+
+			.pcard__media--empty {
+				display: grid;
+				place-items: center;
+			}
+
+			.pcard__media--empty span {
+				font-size: clamp(3rem, 12vw, 6rem);
+				font-weight: 600;
+				letter-spacing: -0.02em;
+				color: var(--text-3);
+				opacity: 0.4;
+			}
+
+			.pcard__panel {
+				padding: clamp(1.5rem, 4vw, 2.5rem);
+			}
+
+			.pcard__top {
+				display: flex;
+				align-items: baseline;
+				gap: 0.75rem;
+				margin-bottom: 0.85rem;
+			}
+
+			.pcard__num {
+				font-size: 0.85rem;
+				font-weight: 600;
+				letter-spacing: 0.08em;
+				color: var(--accent);
+				font-variant-numeric: tabular-nums;
+			}
+
+			.pcard__year {
+				margin-left: auto;
+				font-size: 0.82rem;
+				color: var(--text-3);
+				font-variant-numeric: tabular-nums;
+			}
+
+			.pcard__name {
+				margin: 0 0 0.7rem;
+				font-size: clamp(1.35rem, 3.5vw, 1.9rem);
+				line-height: 1.15;
+				letter-spacing: -0.015em;
+				font-weight: 600;
+			}
+
+			.pcard__desc {
+				margin: 0 0 1.4rem;
+				color: var(--text-2);
+				font-size: clamp(0.98rem, 2vw, 1.05rem);
+				line-height: 1.6;
+				max-width: 44rem;
+			}
+
+			/* Stack tecnológico como texto (sin pastillas). */
+			.pcard__tech {
+				margin: 0;
+				font-family:
+					ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
+					monospace;
+				font-size: 0.82rem;
+				line-height: 1.7;
+				letter-spacing: 0.01em;
+				color: var(--text-3);
+			}
+
+			.pcard__links {
+				display: flex;
+				gap: 1.5rem;
+				margin-top: 1.5rem;
+			}
+
+			.pcard__link {
+				display: inline-flex;
+				align-items: center;
+				gap: 0.4rem;
+				color: var(--accent);
+				text-decoration: none;
+				font-size: 0.95rem;
+				font-weight: 500;
+			}
+
+			.pcard__link span {
+				transition: transform 200ms var(--ease);
+			}
+
+			/* ---------- Skills ---------- */
+			.skills {
+				max-width: 60rem;
+				margin: 0 auto;
+				padding: clamp(2rem, 6vh, 4rem) 1.5rem clamp(3rem, 8vh, 5rem);
+			}
+
+			.skills__head {
+				margin-bottom: clamp(1.75rem, 4vh, 2.5rem);
+			}
+
+			.skills__grid {
+				display: grid;
+				gap: 1.6rem;
+			}
+
+			.skills__group {
+				display: grid;
+				gap: 0.85rem;
+				padding-bottom: 1.6rem;
+				border-bottom: 1px solid var(--hairline);
+			}
+
+			.skills__group:last-child {
+				border-bottom: none;
+				padding-bottom: 0;
+			}
+
+			.skills__label {
+				margin: 0;
+				font-size: 0.76rem;
+				font-weight: 600;
+				text-transform: uppercase;
+				letter-spacing: 0.14em;
+				color: var(--text-3);
+			}
+
+			.skills__tech {
+				margin: 0;
+				font-family:
+					ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
+					monospace;
+				font-size: 0.9rem;
+				line-height: 1.75;
+				letter-spacing: 0.01em;
+				color: var(--text-2);
+			}
+
+			/* ---------- Footer ---------- */
+			.footer {
+				border-top: 1px solid var(--hairline);
+				margin-top: clamp(2rem, 6vh, 4rem);
+			}
+
+			.footer__inner {
+				max-width: 60rem;
+				margin: 0 auto;
+				padding: clamp(3rem, 8vh, 5rem) 1.5rem;
+				display: flex;
+				flex-direction: column;
+				gap: 1rem;
+			}
+
+			.footer__eyebrow {
+				margin: 0;
+				font-size: 0.95rem;
+				color: var(--text-3);
+			}
+
+			.footer__mail {
+				font-size: clamp(1.5rem, 5vw, 2.5rem);
+				font-weight: 600;
+				letter-spacing: -0.02em;
+				color: var(--text);
+				text-decoration: none;
+				width: fit-content;
+				transition: color 200ms var(--ease);
+			}
+
+			.footer__links {
+				list-style: none;
+				display: flex;
+				gap: 1.5rem;
+				margin: 0.5rem 0 0;
+				padding: 0;
+			}
+
+			.footer__links a {
+				color: var(--text-2);
+				text-decoration: none;
+				font-size: 0.95rem;
+				transition: color 200ms var(--ease);
+			}
+
+			.footer__note {
+				margin: 0.5rem 0 0;
+				font-size: 0.85rem;
+				color: var(--text-3);
+			}
+
+			/* ---------- Hover (solo puntero fino) ---------- */
+			@media (hover: hover) and (pointer: fine) {
+				.pcard__link:hover span {
+					transform: translateX(3px);
+				}
+				.footer__mail:hover,
+				.footer__links a:hover {
+					color: var(--accent);
+				}
+				.pcard__media--zoom {
+					cursor: zoom-in;
+				}
+				.pcard__media--zoom img {
+					transition: transform 300ms var(--ease);
+				}
+				.pcard__media--zoom:hover img {
+					transform: scale(1.03);
+				}
+				.lightbox__close:hover {
+					border-color: var(--accent);
+				}
+			}
+
+			.lightbox__close:active {
+				transform: scale(0.94);
+			}
+
+			.pcard__link:active {
+				transform: scale(0.97);
+			}
+
+			/* ---------- Lightbox (dialog nativo) ---------- */
+			.lightbox {
+				margin: auto;
+				padding: 0;
+				border: 0;
+				overflow: visible;
+				background: transparent;
+				max-width: 90vw;
+				max-height: 85vh;
+			}
+
+			.lightbox::backdrop {
+				background: rgba(6, 6, 9, 0.82);
+			}
+
+			.lightbox__img {
+				display: block;
+				width: auto;
+				height: auto;
+				max-width: 90vw;
+				max-height: 85vh;
+				border-radius: 14px;
+				border: 1px solid var(--hairline-2);
+				box-shadow: 0 40px 90px -40px rgba(0, 0, 0, 0.95);
+			}
+
+			.lightbox__close {
+				position: absolute;
+				top: -0.85rem;
+				right: -0.85rem;
+				width: 2.25rem;
+				height: 2.25rem;
+				display: grid;
+				place-items: center;
+				padding: 0;
+				border-radius: 50%;
+				border: 1px solid var(--hairline-2);
+				background: var(--surface);
+				color: var(--text);
+				font-size: 0.95rem;
+				line-height: 1;
+				cursor: pointer;
+				transition:
+					transform 200ms var(--ease),
+					border-color 200ms var(--ease);
+			}
+
+			.lightbox[open] {
+				animation: lb-in 240ms var(--ease);
+			}
+
+			.lightbox[open]::backdrop {
+				animation: lb-backdrop 240ms var(--ease);
+			}
+
+			@keyframes lb-in {
+				from {
+					opacity: 0;
+					transform: scale(0.97);
+				}
+			}
+
+			@keyframes lb-backdrop {
+				from {
+					opacity: 0;
+				}
+			}
+
+			/* ---------- Entrada del hero (stagger) ---------- */
+			.intro {
+				opacity: 0;
+				transform: translateY(16px);
+			}
+
+			body.is-ready .intro {
+				opacity: 1;
+				transform: none;
+				transition:
+					opacity 500ms var(--ease),
+					transform 500ms var(--ease);
+				transition-delay: calc(var(--i) * 80ms);
+			}
+
+			/* ---------- Reveals on-scroll ---------- */
+			.reveal {
+				opacity: 0;
+				transform: translateY(12px);
+			}
+
+			.reveal.is-in {
+				opacity: 1;
+				transform: none;
+				transition:
+					opacity 500ms var(--ease),
+					transform 500ms var(--ease);
+				transition-delay: calc(var(--i, 0) * 60ms);
+			}
+
+			/* ---------- Accesibilidad ---------- */
+			@media (prefers-reduced-motion: reduce) {
+				:global(html) {
+					scroll-behavior: auto;
+				}
+				/* El stacking queda: es scroll nativo, no animación. Solo fades. */
+				.intro,
+				.reveal {
+					transform: none;
+				}
+				body.is-ready .intro,
+				.reveal.is-in {
+					transition: opacity 300ms ease;
+					transform: none;
+				}
+				.pcard__link:active {
+					transform: none;
+				}
+				.pcard__link:hover span {
+					transform: none;
+				}
+				.pcard__media--zoom:hover img {
+					transform: none;
+				}
+				.lightbox__close:active {
+					transform: none;
+				}
+				/* Lightbox: solo fade, sin escala. */
+				.lightbox[open] {
+					animation: lb-backdrop 200ms var(--ease);
+				}
+				.lightbox[open]::backdrop {
+					animation: lb-backdrop 200ms var(--ease);
+				}
+			}
+
+			@media (prefers-contrast: more) {
+				:global(:root) {
+					--text-2: #d2d2d6;
+					--text-3: #b2b2b8;
+					--hairline: rgba(255, 255, 255, 0.28);
+					--hairline-2: rgba(255, 255, 255, 0.34);
+				}
+			}
+
+			/* ---------- Desktop: panel e imagen lado a lado ---------- */
+			@media (min-width: 52rem) {
+				.pcard__inner {
+					display: grid;
+					grid-template-columns: 1.35fr 1fr;
+					align-items: stretch;
+				}
+				.pcard__media {
+					aspect-ratio: auto;
+					border-bottom: none;
+					border-right: 1px solid var(--hairline);
+					min-height: 100%;
+				}
+				.pcard__panel {
+					display: flex;
+					flex-direction: column;
+					justify-content: center;
+				}
+				.pcard__desc {
+					margin-bottom: 1.6rem;
+				}
+			}
+		</style>
+	</body>
+</html>

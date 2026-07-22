@@ -1,0 +1,676 @@
+---
+// ============================================================
+// Diseño 13 — "Registro"
+// Los proyectos como bitácora profesional: una espina temporal
+// vertical con marcadores de año. Cuenta trayectoria — ideal
+// para un perfil que va sumando trabajos con el tiempo.
+// Sobrio, oscuro cálido, acento teal apagado.
+// Fuente única de contenido: src/data/profile.ts
+// ============================================================
+import { profile, projects, skills } from '../../data/profile';
+
+const metaDescription = `${profile.name} — ${profile.role}. ${profile.tagline}`;
+---
+
+<html lang="es">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="generator" content={Astro.generator} />
+		<meta name="description" content={metaDescription} />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<title>{profile.name} — {profile.role}</title>
+	</head>
+	<body>
+		<main>
+			<!-- HERO -->
+			<header class="hero">
+				<img
+					class="hero__avatar intro"
+					style="--i: 0"
+					src={profile.avatar}
+					alt={`Foto de ${profile.name}`}
+					width="160"
+					height="160"
+					decoding="async"
+				/>
+				<h1 class="hero__name intro" style="--i: 1">{profile.name}</h1>
+				<p class="hero__role intro" style="--i: 2">{profile.role}</p>
+				<p class="hero__tagline intro" style="--i: 3">{profile.tagline}</p>
+			</header>
+
+			<!-- REGISTRO DE PROYECTOS -->
+			<section class="log" aria-labelledby="log-title">
+				<h2 id="log-title" class="log__title" data-reveal>Proyectos</h2>
+				<ol class="log__list">
+					{
+						projects.map((project, i) => (
+							<li class="entry" data-reveal aria-labelledby={`entry-name-${i}`}>
+								<div class="entry__marker" aria-hidden="true">
+									<span class="entry__dot" />
+									{project.year && <span class="entry__year">{project.year}</span>}
+								</div>
+								<article class="entry__body">
+									<h3 id={`entry-name-${i}`} class="entry__name">
+										{project.name}
+									</h3>
+									<div class="entry__frame">
+										{project.image ? (
+											<button
+												type="button"
+												class="entry__zoom"
+												data-zoom-src={project.image}
+												data-zoom-alt={`Captura del proyecto ${project.name}`}
+												aria-label={`Ampliar captura de ${project.name}`}
+											>
+												<img
+													src={project.image}
+													alt={`Captura del proyecto ${project.name}`}
+													width="1600"
+													height="1000"
+													loading={i === 0 ? 'eager' : 'lazy'}
+													decoding="async"
+												/>
+											</button>
+										) : (
+											<div class="entry__fallback" aria-hidden="true">
+												<span>{project.name.charAt(0).toUpperCase()}</span>
+											</div>
+										)}
+									</div>
+									<p class="entry__desc">{project.description}</p>
+									{project.stack.length > 0 && (
+										<p class="entry__stack" aria-label="Tecnologías">
+											{project.stack.join(' · ')}
+										</p>
+									)}
+									{(project.repo || project.demo) && (
+										<p class="entry__links">
+											{project.demo && (
+												<a href={project.demo} target="_blank" rel="noopener noreferrer">
+													Ver demo <span aria-hidden="true">↗</span>
+												</a>
+											)}
+											{project.repo && (
+												<a href={project.repo} target="_blank" rel="noopener noreferrer">
+													Código <span aria-hidden="true">↗</span>
+												</a>
+											)}
+										</p>
+									)}
+								</article>
+							</li>
+						))
+					}
+				</ol>
+			</section>
+
+			<!-- SKILLS -->
+			<section class="skills" aria-labelledby="skills-title">
+				<h2 id="skills-title" class="skills__title" data-reveal>Stack</h2>
+				<div class="skills__groups">
+					{
+						skills.map((group, i) => (
+							<div class="skills__group" data-reveal style={`--reveal-delay: ${i * 50}ms`}>
+								<h3>{group.label}</h3>
+								<p>{group.items.join(' · ')}</p>
+							</div>
+						))
+					}
+				</div>
+			</section>
+
+			<!-- CONTACTO -->
+			<footer class="footer">
+				<div data-reveal>
+					<h2 class="footer__title">¿Trabajamos juntos?</h2>
+					<a class="footer__cta" href={`mailto:${profile.email}`}>{profile.email}</a>
+					<p class="footer__links">
+						{
+							profile.links.github && (
+								<a href={profile.links.github} target="_blank" rel="noopener noreferrer">
+									GitHub
+								</a>
+							)
+						}
+						{
+							profile.links.linkedin && (
+								<a href={profile.links.linkedin} target="_blank" rel="noopener noreferrer">
+									LinkedIn
+								</a>
+							)
+						}
+					</p>
+					<p class="footer__meta">{profile.location}</p>
+				</div>
+			</footer>
+		</main>
+
+		<!-- LIGHTBOX -->
+		<dialog class="lightbox" id="lightbox" aria-label="Vista ampliada de la captura">
+			<button type="button" class="lightbox__close" data-lightbox-close aria-label="Cerrar">
+				<span aria-hidden="true">✕</span>
+			</button>
+			<img class="lightbox__img" id="lightbox-img" alt="" width="1600" height="1000" decoding="async" />
+		</dialog>
+
+		<style>
+			:root {
+				--bg: #0f0e0c;
+				--surface: #171613;
+				--border: rgba(255, 250, 240, 0.09);
+				--border-strong: rgba(255, 250, 240, 0.17);
+				--text: #f0eee9;
+				--text-2: #a5a29a;
+				--text-3: #6d6a62;
+				--accent: #7fc9c0;
+				--mono: ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, Consolas,
+					monospace;
+				--ease: cubic-bezier(0.23, 1, 0.32, 1);
+				--maxw: 880px;
+			}
+
+			* {
+				box-sizing: border-box;
+			}
+
+			:global(html) {
+				scroll-behavior: smooth;
+			}
+
+			:global(body) {
+				margin: 0;
+				background: var(--bg);
+				color: var(--text);
+				font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+				line-height: 1.6;
+				-webkit-font-smoothing: antialiased;
+				overflow-x: hidden;
+			}
+
+			img {
+				display: block;
+				max-width: 100%;
+				height: auto;
+			}
+
+			ol {
+				margin: 0;
+				padding: 0;
+				list-style: none;
+			}
+
+			/* ---------- HERO ---------- */
+			.hero {
+				max-width: var(--maxw);
+				margin: 0 auto;
+				padding: 6.5rem 1.5rem 4.5rem;
+				text-align: center;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+			}
+
+			.hero__avatar {
+				width: clamp(116px, 30vw, 148px);
+				aspect-ratio: 1;
+				border-radius: 50%;
+				object-fit: cover;
+				border: 1px solid var(--border-strong);
+			}
+
+			.hero__name {
+				margin: 1.6rem 0 0;
+				font-size: clamp(2.4rem, 8vw, 4.4rem);
+				line-height: 1.03;
+				letter-spacing: -0.02em;
+				font-weight: 650;
+			}
+
+			.hero__role {
+				margin: 0.9rem 0 0;
+				font-family: var(--mono);
+				font-size: 0.78rem;
+				text-transform: uppercase;
+				letter-spacing: 0.22em;
+				color: var(--accent);
+			}
+
+			.hero__tagline {
+				margin: 1.1rem 0 0;
+				max-width: 46ch;
+				color: var(--text-2);
+				font-size: clamp(1rem, 2.4vw, 1.12rem);
+				text-wrap: balance;
+			}
+
+			/* ---------- REGISTRO ---------- */
+			.log {
+				max-width: var(--maxw);
+				margin: 0 auto;
+				padding: 2rem 1.5rem 3rem;
+			}
+
+			.log__title {
+				margin: 0 0 2.4rem;
+				font-size: clamp(1.6rem, 4vw, 2.2rem);
+				letter-spacing: -0.02em;
+				font-weight: 640;
+			}
+
+			/* Espina temporal: hairline continua a la izquierda */
+			.log__list {
+				position: relative;
+				display: grid;
+				gap: 4rem;
+			}
+
+			.log__list::before {
+				content: '';
+				position: absolute;
+				top: 0.4rem;
+				bottom: 0.4rem;
+				left: 3px;
+				width: 1px;
+				background: var(--border);
+			}
+
+			.entry {
+				position: relative;
+				padding-left: 2rem;
+			}
+
+			.entry__marker {
+				position: absolute;
+				left: 0;
+				top: 0.4rem;
+				display: flex;
+				align-items: center;
+				gap: 0.9rem;
+			}
+
+			.entry__dot {
+				width: 7px;
+				height: 7px;
+				border-radius: 999px;
+				background: var(--accent);
+				flex: none;
+			}
+
+			.entry__year {
+				font-family: var(--mono);
+				font-size: 0.76rem;
+				color: var(--text-3);
+				font-variant-numeric: tabular-nums;
+			}
+
+			.entry__name {
+				margin: 0 0 1rem;
+				padding-top: 1.6rem;
+				font-size: clamp(1.25rem, 3vw, 1.6rem);
+				letter-spacing: -0.015em;
+				font-weight: 640;
+			}
+
+			.entry__frame {
+				max-width: 620px;
+				border: 1px solid var(--border);
+				border-radius: 12px;
+				overflow: hidden;
+				background: var(--surface);
+			}
+
+			.entry__frame img {
+				width: 100%;
+				aspect-ratio: 16 / 10;
+				object-fit: cover;
+			}
+
+			.entry__zoom {
+				display: block;
+				width: 100%;
+				margin: 0;
+				padding: 0;
+				border: none;
+				background: none;
+				cursor: pointer;
+			}
+
+			.entry__zoom img {
+				transition: transform 0.3s var(--ease);
+			}
+
+			.entry__zoom:focus-visible {
+				outline: 2px solid var(--accent);
+				outline-offset: -3px;
+			}
+
+			.entry__fallback {
+				aspect-ratio: 16 / 10;
+				display: grid;
+				place-items: center;
+			}
+
+			.entry__fallback span {
+				font-size: clamp(2.5rem, 8vw, 4rem);
+				font-weight: 700;
+				color: var(--text-3);
+			}
+
+			.entry__desc {
+				margin: 1rem 0 0;
+				color: var(--text-2);
+				max-width: 64ch;
+			}
+
+			.entry__stack {
+				margin: 0.7rem 0 0;
+				font-family: var(--mono);
+				font-size: 0.78rem;
+				letter-spacing: 0.02em;
+				color: var(--text-3);
+			}
+
+			.entry__links {
+				margin: 0.9rem 0 0;
+				display: flex;
+				gap: 1.4rem;
+			}
+
+			.entry__links a {
+				color: var(--accent);
+				text-decoration: none;
+				font-size: 0.9rem;
+				font-weight: 550;
+				transition: opacity 0.2s var(--ease);
+			}
+
+			/* ---------- SKILLS ---------- */
+			.skills {
+				max-width: var(--maxw);
+				margin: 0 auto;
+				padding: 3rem 1.5rem 4rem;
+				border-top: 1px solid var(--border);
+			}
+
+			.skills__title {
+				margin: 0 0 2rem;
+				font-size: clamp(1.6rem, 4vw, 2.2rem);
+				letter-spacing: -0.02em;
+				font-weight: 640;
+			}
+
+			.skills__groups {
+				display: grid;
+				grid-template-columns: 1fr;
+				gap: 1.7rem;
+			}
+
+			.skills__group h3 {
+				margin: 0 0 0.45rem;
+				font-family: var(--mono);
+				font-size: 0.72rem;
+				text-transform: uppercase;
+				letter-spacing: 0.2em;
+				color: var(--text-3);
+				font-weight: 600;
+			}
+
+			.skills__group p {
+				margin: 0;
+				font-family: var(--mono);
+				font-size: 0.88rem;
+				color: var(--text-2);
+			}
+
+			/* ---------- FOOTER ---------- */
+			.footer {
+				border-top: 1px solid var(--border);
+				padding: 5rem 1.5rem 4.5rem;
+				text-align: center;
+			}
+
+			.footer__title {
+				margin: 0 0 1.5rem;
+				font-size: clamp(1.8rem, 5vw, 2.6rem);
+				letter-spacing: -0.02em;
+				font-weight: 640;
+			}
+
+			.footer__cta {
+				display: inline-block;
+				color: var(--text);
+				text-decoration: none;
+				font-size: clamp(1.05rem, 3vw, 1.3rem);
+				font-weight: 550;
+				border-bottom: 1px solid var(--border-strong);
+				padding-bottom: 2px;
+				transition: border-color 0.2s var(--ease);
+			}
+
+			.footer__links {
+				margin: 1.9rem 0 0;
+				display: flex;
+				justify-content: center;
+				gap: 1.6rem;
+			}
+
+			.footer__links a {
+				color: var(--text-2);
+				text-decoration: none;
+				font-size: 0.92rem;
+				transition: color 0.2s var(--ease);
+			}
+
+			.footer__meta {
+				margin: 1.7rem 0 0;
+				font-family: var(--mono);
+				font-size: 0.78rem;
+				color: var(--text-3);
+			}
+
+			/* ---------- LIGHTBOX ---------- */
+			.lightbox {
+				max-width: 90vw;
+				max-height: 85vh;
+				margin: auto;
+				padding: 0;
+				border: none;
+				background: none;
+				overflow: visible;
+			}
+
+			.lightbox::backdrop {
+				background: rgba(6, 6, 4, 0.86);
+				backdrop-filter: blur(2px);
+			}
+
+			.lightbox__img {
+				max-width: 90vw;
+				max-height: 85vh;
+				width: auto;
+				height: auto;
+				border-radius: 10px;
+				border: 1px solid var(--border-strong);
+			}
+
+			.lightbox__close {
+				position: absolute;
+				top: -0.6rem;
+				right: -0.6rem;
+				width: 2.2rem;
+				height: 2.2rem;
+				display: grid;
+				place-items: center;
+				border-radius: 999px;
+				border: 1px solid var(--border-strong);
+				background: var(--surface);
+				color: var(--text);
+				cursor: pointer;
+				transition: transform 0.16s var(--ease);
+			}
+
+			.lightbox[open] {
+				animation: lb-in 0.24s var(--ease);
+			}
+
+			.lightbox[open]::backdrop {
+				animation: lb-fade 0.24s var(--ease);
+			}
+
+			@keyframes lb-in {
+				from {
+					opacity: 0;
+					transform: scale(0.97);
+				}
+			}
+
+			@keyframes lb-fade {
+				from {
+					opacity: 0;
+				}
+			}
+
+			/* ---------- MOTION ---------- */
+			.intro {
+				opacity: 0;
+				transform: translateY(12px);
+				animation: intro-in 0.5s var(--ease) forwards;
+				animation-delay: calc(var(--i) * 90ms + 80ms);
+			}
+
+			@keyframes intro-in {
+				to {
+					opacity: 1;
+					transform: none;
+				}
+			}
+
+			[data-reveal] {
+				opacity: 0;
+				transform: translateY(12px);
+				transition:
+					opacity 0.5s var(--ease),
+					transform 0.5s var(--ease);
+				transition-delay: var(--reveal-delay, 0ms);
+			}
+
+			[data-reveal].is-visible {
+				opacity: 1;
+				transform: none;
+			}
+
+			/* ---------- HOVER / PRESS ---------- */
+			@media (hover: hover) and (pointer: fine) {
+				.entry__zoom {
+					cursor: zoom-in;
+				}
+				.entry__zoom:hover img {
+					transform: scale(1.02);
+				}
+				.entry__links a:hover {
+					opacity: 0.8;
+				}
+				.footer__cta:hover {
+					border-color: var(--accent);
+				}
+				.footer__links a:hover {
+					color: var(--text);
+				}
+				.lightbox__close:hover {
+					transform: scale(1.06);
+				}
+			}
+
+			.footer__cta:active,
+			.entry__links a:active {
+				opacity: 0.7;
+			}
+
+			/* ---------- DESKTOP ---------- */
+			@media (min-width: 720px) {
+				.entry {
+					padding-left: 7.5rem;
+				}
+				.entry__name {
+					padding-top: 0;
+				}
+				.skills__groups {
+					grid-template-columns: repeat(3, 1fr);
+				}
+			}
+
+			/* ---------- REDUCED MOTION ---------- */
+			@media (prefers-reduced-motion: reduce) {
+				:global(html) {
+					scroll-behavior: auto;
+				}
+				.intro {
+					transform: none;
+					animation: fade-only 0.4s var(--ease) forwards;
+					animation-delay: calc(var(--i) * 60ms);
+				}
+				[data-reveal] {
+					transform: none;
+					transition: opacity 0.4s var(--ease);
+				}
+				.entry__zoom img {
+					transition: none;
+				}
+				.lightbox[open] {
+					animation: lb-fade 0.2s var(--ease);
+				}
+			}
+
+			@keyframes fade-only {
+				to {
+					opacity: 1;
+				}
+			}
+		</style>
+
+		<script>
+			// Reveals on-scroll (una sola vez)
+			const revealItems = document.querySelectorAll('[data-reveal]');
+			if ('IntersectionObserver' in window && revealItems.length) {
+				const io = new IntersectionObserver(
+					(entries, obs) => {
+						entries.forEach((entry) => {
+							if (entry.isIntersecting) {
+								entry.target.classList.add('is-visible');
+								obs.unobserve(entry.target);
+							}
+						});
+					},
+					{ threshold: 0.12, rootMargin: '0px 0px -8% 0px' }
+				);
+				revealItems.forEach((el) => io.observe(el));
+			} else {
+				revealItems.forEach((el) => el.classList.add('is-visible'));
+			}
+
+			// Lightbox reutilizable
+			const lightbox = document.getElementById('lightbox') as HTMLDialogElement | null;
+			const lightboxImg = document.getElementById('lightbox-img') as HTMLImageElement | null;
+
+			if (lightbox && lightboxImg && typeof lightbox.showModal === 'function') {
+				document.querySelectorAll<HTMLButtonElement>('[data-zoom-src]').forEach((btn) => {
+					btn.addEventListener('click', () => {
+						const src = btn.dataset.zoomSrc;
+						if (!src) return;
+						lightboxImg.src = src;
+						lightboxImg.alt = btn.dataset.zoomAlt || '';
+						lightbox.showModal();
+					});
+				});
+				lightbox.addEventListener('click', (event) => {
+					const target = event.target as HTMLElement;
+					if (target === lightbox || target.closest('[data-lightbox-close]')) {
+						lightbox.close();
+					}
+				});
+				lightbox.addEventListener('close', () => lightboxImg.removeAttribute('src'));
+			}
+		</script>
+	</body>
+</html>

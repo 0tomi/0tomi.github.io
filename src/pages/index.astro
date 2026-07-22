@@ -1,0 +1,130 @@
+---
+// Hub temporal para comparar las 5 maquetas de portfolio.
+// Cuando elijamos un diseño, este archivo se reemplaza por el diseño ganador.
+const designs = [
+	{
+		slug: '03-editorial',
+		name: 'Editorial',
+		desc: 'Minimalismo suizo tipográfico, ahora con modo claro/oscuro y zoom.',
+	},
+	{
+		slug: '06-showcase',
+		name: 'Showcase',
+		desc: 'Oscuro con la captura como protagonista: carrusel de tarjetas grandes.',
+	},
+	{
+		slug: '07-stack',
+		name: 'Stack',
+		desc: 'Hero centrado estilo Showcase + proyectos apilados al scrollear.',
+	},
+	{
+		slug: '09-noir',
+		name: 'Noir',
+		desc: 'Combinación: hero centrado del Showcase + filas editoriales, en oscuro.',
+	},
+	{
+		slug: '10-split',
+		name: 'Split',
+		desc: 'Combinación: hero foto izquierda / texto derecha + carrusel grande.',
+	},
+	{
+		slug: '11-panorama',
+		name: 'Panorama',
+		desc: 'Cinematográfico monocromo: cada proyecto casi a pantalla completa.',
+	},
+	{
+		slug: '12-sidebar',
+		name: 'Sidebar',
+		desc: 'Identidad fija a la izquierda, proyectos scrolleando a la derecha.',
+	},
+	{
+		slug: '13-registro',
+		name: 'Registro',
+		desc: 'Bitácora profesional: proyectos sobre una espina temporal con años.',
+	},
+];
+---
+
+<html lang="es">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="generator" content={Astro.generator} />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<title>Maquetas — portfolio 0tomi</title>
+		<style>
+			html,
+			body {
+				margin: 0;
+				background: #0d1117;
+				color: #e6edf3;
+				font-family: ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, monospace;
+			}
+			main {
+				max-width: 40rem;
+				margin: 0 auto;
+				padding: 4rem 1.5rem;
+			}
+			h1 {
+				font-size: 1.25rem;
+				font-weight: 600;
+			}
+			p.hint {
+				color: #8b949e;
+				font-size: 0.85rem;
+			}
+			ol {
+				list-style: none;
+				padding: 0;
+				display: flex;
+				flex-direction: column;
+				gap: 0.75rem;
+			}
+			a {
+				display: block;
+				padding: 1rem 1.25rem;
+				border: 1px solid #30363d;
+				border-radius: 8px;
+				color: inherit;
+				text-decoration: none;
+				transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1), border-color 160ms ease;
+			}
+			a:active {
+				transform: scale(0.98);
+			}
+			@media (hover: hover) and (pointer: fine) {
+				a:hover {
+					border-color: #58a6ff;
+				}
+			}
+			a strong {
+				display: block;
+				margin-bottom: 0.25rem;
+			}
+			a span {
+				color: #8b949e;
+				font-size: 0.85rem;
+			}
+		</style>
+	</head>
+	<body>
+		<main>
+			<h1>$ ls ~/maquetas</h1>
+			<p class="hint">5 diseños candidatos para el portfolio. Elegí uno y lo iteramos.</p>
+			<ol>
+				{
+					designs.map((d, i) => (
+						<li>
+							<a href={`/designs/${d.slug}`}>
+								<strong>
+									{String(i + 1).padStart(2, '0')} · {d.name}
+								</strong>
+								<span>{d.desc}</span>
+							</a>
+						</li>
+					))
+				}
+			</ol>
+		</main>
+	</body>
+</html>

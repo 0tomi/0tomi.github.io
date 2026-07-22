@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+	<!-- Placeholder de foto de perfil. Reemplazar subiendo tu foto real
+	     (ej: public/avatar.jpg) y actualizando profile.avatar. -->
+	<defs>
+		<radialGradient id="bg" cx="38%" cy="30%" r="95%">
+			<stop offset="0%" stop-color="#333a4c"/>
+			<stop offset="100%" stop-color="#14161d"/>
+		</radialGradient>
+	</defs>
+	<rect width="400" height="400" fill="url(#bg)"/>
+	<circle cx="200" cy="160" r="58" fill="#98a0b4" opacity="0.5"/>
+	<path d="M 92 400 C 92 312 140 262 200 262 C 260 262 308 312 308 400 Z" fill="#98a0b4" opacity="0.5"/>
+</svg>

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000">
+	<!-- Placeholder de captura de proyecto (reemplazar por screenshot real) -->
+	<rect width="1600" height="1000" fill="#101613"/>
+	<rect width="1600" height="72" fill="#18211c"/>
+	<circle cx="48" cy="36" r="10" fill="#27362e"/><circle cx="84" cy="36" r="10" fill="#27362e"/><circle cx="120" cy="36" r="10" fill="#27362e"/>
+	<rect x="48" y="120" width="1504" height="808" rx="12" fill="#18211c"/>
+	<rect x="96" y="168" width="420" height="20" rx="10" fill="#27362e"/>
+	<rect x="96" y="230" width="1408" height="1" fill="#27362e"/>
+	<rect x="96" y="270" width="1360" height="14" rx="7" fill="#223029"/>
+	<rect x="96" y="310" width="1200" height="14" rx="7" fill="#223029"/>
+	<rect x="96" y="350" width="1300" height="14" rx="7" fill="#223029"/>
+	<rect x="96" y="390" width="1100" height="14" rx="7" fill="#223029"/>
+	<rect x="96" y="430" width="1240" height="14" rx="7" fill="#223029"/>
+	<rect x="96" y="500" width="640" height="380" rx="12" fill="#121a16"/>
+	<polyline points="140,820 260,760 380,790 500,700 620,730 700,660" fill="none" stroke="#34d399" stroke-width="6" stroke-linecap="round" opacity="0.7"/>
+	<rect x="784" y="500" width="672" height="380" rx="12" fill="#121a16"/>
+	<rect x="832" y="550" width="240" height="16" rx="8" fill="#27362e"/>
+	<text x="800" y="980" text-anchor="middle" font-family="ui-monospace, monospace" font-size="26" fill="#3f544a">captura del proyecto — 1600×1000</text>
+</svg>
